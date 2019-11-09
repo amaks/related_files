@@ -24,7 +24,8 @@ class RelatedFilesCommand(sublime_plugin.TextCommand):
       else:
         controller_file   = rails_view_path + '/controllers/' + only_file_name + '_controller.rb'
 
-      files.append(controller_file)
+      if os.path.isfile(controller_file):
+        files.append(controller_file)
 
     result = glob.glob(files_source_path + '/*')
 

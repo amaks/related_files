@@ -13,9 +13,11 @@ class RelatedFilesCommand(sublime_plugin.TextCommand):
     if 'controllers' in source_path:
       controller_file   = None
       files_source_path = self.views_file_path(file_name, rails_view_path)
-    elif 'models' in source_path:
+    elif '/models' in source_path:
       files_source_path, controller_file = self.view_related_files(file_name, rails_view_path)
-    else:
+    elif '/services' in source_path:
+      files_source_path, controller_file = self.services_related_files(file_name, rails_view_path)
+    else: # views
       files_source_path = source_path
       controller_file   = self.controller_file_path(file_name, rails_view_path, source_path)
 
@@ -38,6 +40,18 @@ class RelatedFilesCommand(sublime_plugin.TextCommand):
 
     self.files = files
     sublime.active_window().show_quick_panel(files, self.open_file)
+
+  def services_related_files(self, file_name, rails_view_path):
+    only_file_name    = self.service_file_name(file_name)
+    files_source_path = rails_view_path + '/views/' + only_file_name +'s/'
+    controller_file   = rails_view_path + '/controllers/' + only_file_name + 's_controller.rb'
+
+    return files_source_path, controller_file
+
+  def service_file_name(self, file_name):
+    only_file_name = file_name.split('/')[-1].split('.rb')[0].replace('create_', '').replace('_create', '').replace('update_', '').replace('_update', '').replace('destroy_', '').replace('_destroy', '')
+
+    return only_file_name
 
   def view_related_files(self, file_name, rails_view_path):
     only_file_name = file_name.split('/')[-1].split('.rb')[0]
